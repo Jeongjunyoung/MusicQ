@@ -36,6 +36,7 @@ import musicq.apps.obg.service.MusicApplication;
 
 public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder>{
     private int playPosition;
+    private Long mPlayingId;
     private ArrayList<AudioViewHolder> viewList = new ArrayList<>();
     public MusicAdapter(Context context, Cursor cursor) {
         super(context, cursor);
@@ -113,7 +114,7 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
         public void setAudioItem(AudioItem item, int position) {
             mItem = item;
             mPosition = position;
-            if (mPosition == playPosition) {
+            if (mPlayingId == item.mId) {
                 mTitle.setTextColor(Color.parseColor("#e49292"));
             }
             mTitle.setText(item.mTitle);
@@ -136,6 +137,10 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
         }
     }
 
+    public void setPlayingPosition(Long playingId) {
+        mPlayingId = playingId;
+        notifyDataSetChanged();
+    }
     public void bottomUIChangeMusic(int i) {
         setNowPlaying(i);
     }

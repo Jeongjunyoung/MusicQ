@@ -21,7 +21,11 @@ public class MusicListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_list, container, false);
-
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            Long playingId = bundle.getLong("playingId",0);
+            Log.d("MLF", "" + playingId);
+        }
         ListPagerAdapter mListPagerAdapter = new ListPagerAdapter(getChildFragmentManager());
         ViewPager mViewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
         mViewPager.setAdapter(mListPagerAdapter);

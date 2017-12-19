@@ -52,7 +52,7 @@ public class SongFragment extends Fragment{
     private static String FRAGMENT_TAG = "PLAYING_FRAGMENT";
     private static final int LOADER_ID = 0;
     private static final String TAG = "SONGF";
-
+    Long playingId;
     public static SongFragment newInstance() {
         Bundle args = new Bundle();
         SongFragment fragment = new SongFragment();
@@ -69,25 +69,30 @@ public class SongFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_song, container, false);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1000);
-            } else {
-                // READ_EXTERNAL_STORAGE 에 대한 권한이 있음.
-                getAudioListFromMediaDatabase();
-            }
-        }
-        // OS가 Marshmallow 이전일 경우 권한체크를 하지 않는다.
-        else{
-            getAudioListFromMediaDatabase();
 
-        }
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.song_list);
         mAdapter = new MusicAdapter(getActivity(), null);
         mRecyclerView.setAdapter(mAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(layoutManager);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1000);
+            } else {
+                // READ_EXTERNAL_STORAGE 에 대한 권한이 있음.
+                getAudioListFromMediaDatabase();
+                showPlayingMusic();
+
+            }
+        }
+        // OS가 Marshmallow 이전일 경우 권한체크를 하지 않는다.
+        else{
+            getAudioListFromMediaDatabase();
+            showPlayingMusic();
+
+        }
+
         registerBroadcast();
         return rootView;
     }
@@ -128,6 +133,7 @@ public class SongFragment extends Fragment{
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // READ_EXTERNAL_STORAGE 에 대한 권한 획득.
             getAudioListFromMediaDatabase();
+            showPlayingMusic();
         }
     }
 
@@ -147,5 +153,11 @@ public class SongFragment extends Fragment{
     }
     public void unregisterBroadcast(){
         getActivity().unregisterReceiver(mBroadcastReceiver);
+    }
+
+    public void showPlayingMusic() {
+        if (playingId != null) {
+            mAdapter.setPlayingPosition(playingId);
+        }
     }
 }

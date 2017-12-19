@@ -45,6 +45,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
     private TextView mTitle;
     private ImageButton mPlayBtn;
     private MusicAdapter mAdapter;
+    private Long playingId;
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -80,6 +81,12 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
                     selected = youtubeFragment;
                 } else if (position == 1) {
                     selected = musicListFragment;
+                    if (playingId != null) {
+                        Log.d("pId", "" + playingId);
+                        Bundle bundle = new Bundle();
+                        bundle.putLong("playingId",playingId);
+                        selected.setArguments(bundle);
+                    }
                 } /*else if (position == 2) {
                     selected = playingMusicFragment;
                 }*/
@@ -136,6 +143,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), audioItem.mAlbumId);
             //Picasso.with(getApplicationContext()).load(albumArtUri).error(R.drawable.empty_albumart).into(mImgAlbumArt);
             mTitle.setText(audioItem.mTitle);
+            playingId = audioItem.mId;
         } else {
             //mImgAlbumArt.setImageResource(R.drawable.empty_albumart);
             mTitle.setText("재생중인 음악이 없습니다.");
