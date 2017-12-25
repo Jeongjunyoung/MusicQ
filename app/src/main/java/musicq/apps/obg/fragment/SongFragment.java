@@ -157,7 +157,7 @@ public class SongFragment extends Fragment{
 
     public void showPlayingMusic() {
         if (playingId != null) {
-            mAdapter.setPlayingPosition(playingId);
+            //mAdapter.setPlayingId(playingId);
         }
     }
 }

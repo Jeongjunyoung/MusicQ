@@ -35,18 +35,19 @@ import musicq.apps.obg.service.MusicApplication;
 
 
 public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder>{
-    private int playPosition;
-    private Long mPlayingId;
+    private static int playPosition;
     private ArrayList<AudioViewHolder> viewList = new ArrayList<>();
+
     public MusicAdapter(Context context, Cursor cursor) {
         super(context, cursor);
     }
-
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor) {
         AudioItem audioItem = AudioItem.bindCursor(cursor);
-        ((AudioViewHolder) viewHolder).setAudioItem(audioItem, cursor.getPosition());
-        viewList.add((AudioViewHolder) viewHolder);
+        if (audioItem != null) {
+            ((AudioViewHolder) viewHolder).setAudioItem(audioItem, cursor.getPosition());
+            viewList.add((AudioViewHolder) viewHolder);
+        }
     }
 
     @Override
@@ -105,7 +106,7 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
                     playPosition = mPosition;
                     //notifyDataSetChanged();
                     //mTitle.setTextColor(Color.parseColor("#e49292"));
-                    setNowPlaying(mPosition);
+                    setNowPlaying(playPosition);
 
                 }
             });
@@ -114,8 +115,8 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
         public void setAudioItem(AudioItem item, int position) {
             mItem = item;
             mPosition = position;
-            if (mPlayingId == item.mId) {
-                mTitle.setTextColor(Color.parseColor("#e49292"));
+            if (playPosition == mPosition) {
+               mTitle.setTextColor(Color.parseColor("#e49292"));
             }
             mTitle.setText(item.mTitle);
             mArtist.setText(item.mArtist);
@@ -136,12 +137,8 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
             }
         }
     }
-
-    public void setPlayingPosition(Long playingId) {
-        mPlayingId = playingId;
-        notifyDataSetChanged();
-    }
     public void bottomUIChangeMusic(int i) {
+        playPosition = i;
         setNowPlaying(i);
     }
 }

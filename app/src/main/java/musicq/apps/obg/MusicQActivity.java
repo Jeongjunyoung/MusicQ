@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import musicq.apps.obg.adapter.MusicAdapter;
+import musicq.apps.obg.database.DBHelper;
 import musicq.apps.obg.fragment.MusicListFragment;
 import musicq.apps.obg.fragment.PlayingMusicFragment;
 import musicq.apps.obg.fragment.YoutubeFragment;
@@ -39,13 +41,13 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
     YoutubeFragment youtubeFragment;
     MusicListFragment musicListFragment;
     PlayingMusicFragment playingMusicFragment;
+    DBHelper dbHelper;
     private static final int LOADER_ID = 0;
     private static final String TAG = "MAIN";
     private static String FRAGMENT_TAG = "PLAYING_FRAGMENT";
     private TextView mTitle;
     private ImageButton mPlayBtn;
     private MusicAdapter mAdapter;
-    private Long playingId;
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -62,12 +64,18 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         mAdapter = new MusicAdapter(this, null);
         mTitle = (TextView) findViewById(R.id.txt_title);
         mPlayBtn = (ImageButton) findViewById(R.id.btn_play_pause);
+        dbHelper = new DBHelper(this);
+        dbHelper.open();
         findViewById(R.id.bottom_player).setOnClickListener(this);
         findViewById(R.id.btn_rewind).setOnClickListener(this);
         mPlayBtn.setOnClickListener(this);
         findViewById(R.id.btn_forward).setOnClickListener(this);
-
+        FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
         getSupportFragmentManager().beginTransaction().add(R.id.container, youtubeFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.container, musicListFragment).commit();
+        ft1.hide(musicListFragment);
+        ft1.commit();
+        //getSupportFragmentManager().beginTransaction().add(R.id.container,musicListFragment).attach(musicListFragment);
         TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
         tabs.addTab(tabs.newTab().setIcon(R.drawable.menu_star_icon));
         tabs.addTab(tabs.newTab().setIcon(R.drawable.menu_playlist_icon));
@@ -75,22 +83,22 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                Fragment selected = null;
+                FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
                 int position = tab.getPosition();
                 if (position == 0) {
-                    selected = youtubeFragment;
+                    ft2.hide(musicListFragment);
+                    ft2.show(youtubeFragment);
+                    ft2.commit();
                 } else if (position == 1) {
-                    selected = musicListFragment;
-                    if (playingId != null) {
-                        Log.d("pId", "" + playingId);
-                        Bundle bundle = new Bundle();
-                        bundle.putLong("playingId",playingId);
-                        selected.setArguments(bundle);
-                    }
+                    ft2.hide(youtubeFragment);
+                    ft2.show(musicListFragment);
+                    ft2.commit();
                 } /*else if (position == 2) {
                     selected = playingMusicFragment;
                 }*/
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,selected).commit();
+                //getSupportFragmentManager().beginTransaction().replace(R.id.container,selected).commit();
+
+
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
@@ -143,7 +151,6 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), audioItem.mAlbumId);
             //Picasso.with(getApplicationContext()).load(albumArtUri).error(R.drawable.empty_albumart).into(mImgAlbumArt);
             mTitle.setText(audioItem.mTitle);
-            playingId = audioItem.mId;
         } else {
             //mImgAlbumArt.setImageResource(R.drawable.empty_albumart);
             mTitle.setText("재생중인 음악이 없습니다.");
