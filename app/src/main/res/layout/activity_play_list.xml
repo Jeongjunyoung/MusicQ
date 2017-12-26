@@ -1,28 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="57dp"
-        android:background="#5e5e5e">
-        <TextView
-            android:id="@+id/list_title"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="List"
-            android:textColor="#ffffff"
-            android:textSize="30dp"
-            android:layout_gravity="center"
-            android:layout_marginLeft="30dp"/>
+            android:layout_height="57dp"
+            android:background="#5e5e5e">
+            <TextView
+                android:id="@+id/list_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="List"
+                android:textColor="#ffffff"
+                android:textSize="30dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="80dp"/>
 
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/playlist_music"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ListView>
     </LinearLayout>
-    <ListView
-        android:id="@+id/playlist_music"
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/add_music_playlist"
+        android:layout_width="261dp"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="16dp"
+        android:src="@drawable/playlist_add_icon"
+        fab:fab_colorNormal="@color/fabPrimary"
+        fab:fab_colorPressed="@color/fabPressed"
+        fab:fab_colorRipple="@color/fabRipple" />
+    <LinearLayout
+        android:id="@+id/music_list_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#b5eaab"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="57dp"
+            android:background="#5e5e5e">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="MUSIC LIST"
+                android:textColor="#ffffff"
+                android:textSize="30dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="40dp"/>
+            <Button
+                android:layout_width="59dp"
+                android:layout_height="match_parent"
+                android:text="ADD"/>
+        </LinearLayout>
+        <ListView
+            android:id="@+id/add_music_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    </ListView>
-</LinearLayout>
+        </ListView>
+    </LinearLayout>
+</FrameLayout>

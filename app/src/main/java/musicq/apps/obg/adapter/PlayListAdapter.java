@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class PlayListAdapter extends BaseAdapter {
         View view = null;
         PlayListViewHolder holder;
         if (convertView == null) {
-            view = inflater.inflate(R.layout.playlist_item, viewGroup, false);
+            view = inflater.inflate(R.layout.item_playlist, viewGroup, false);
             PlayListVO vo = items.get(i);
             holder = new PlayListViewHolder();
             holder.mLayout = (LinearLayout) view.findViewById(R.id.list_id);
