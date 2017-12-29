@@ -82,15 +82,12 @@ public class SongFragment extends Fragment{
             } else {
                 // READ_EXTERNAL_STORAGE 에 대한 권한이 있음.
                 getAudioListFromMediaDatabase();
-                showPlayingMusic();
 
             }
         }
         // OS가 Marshmallow 이전일 경우 권한체크를 하지 않는다.
         else{
             getAudioListFromMediaDatabase();
-            showPlayingMusic();
-
         }
 
         registerBroadcast();
@@ -133,7 +130,6 @@ public class SongFragment extends Fragment{
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // READ_EXTERNAL_STORAGE 에 대한 권한 획득.
             getAudioListFromMediaDatabase();
-            showPlayingMusic();
         }
     }
 
@@ -155,9 +151,4 @@ public class SongFragment extends Fragment{
         getActivity().unregisterReceiver(mBroadcastReceiver);
     }
 
-    public void showPlayingMusic() {
-        if (playingId != null) {
-            //mAdapter.setPlayingId(playingId);
-        }
-    }
 }

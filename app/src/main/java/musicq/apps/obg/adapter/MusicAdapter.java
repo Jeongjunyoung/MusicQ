@@ -72,32 +72,32 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
         return audioIds;
     }
     private class AudioViewHolder extends RecyclerView.ViewHolder {
-        private final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
-        private ImageView mImgAlbumArt;
-        private TextView mTitle;
-        private TextView mArtist;
-        //private TextView mTxtDuration;
-        private AudioItem mItem;
-        private int mPosition;
-        private AudioViewHolder(View view) {
-            super(view);
-            mImgAlbumArt = (ImageView) view.findViewById(R.id.album_image);
-            mTitle = (TextView) view.findViewById(R.id.music_title);
-            mArtist = (TextView) view.findViewById(R.id.music_artist);
-            //mTxtDuration = (TextView) view.findViewById(R.id.txt_duration);
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds()); // 재생목록등록
-                    MusicApplication.getInstance().getServiceInterface().play(mPosition); // 선택한 오디오재생
-                    playPosition = mPosition;
-                    //notifyDataSetChanged();
-                    //mTitle.setTextColor(Color.parseColor("#e49292"));
-                    setNowPlaying(playPosition);
+            private final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
+            private ImageView mImgAlbumArt;
+            private TextView mTitle;
+            private TextView mArtist;
+            //private TextView mTxtDuration;
+            private AudioItem mItem;
+            private int mPosition;
+            private AudioViewHolder(View view) {
+                super(view);
+                mImgAlbumArt = (ImageView) view.findViewById(R.id.album_image);
+                mTitle = (TextView) view.findViewById(R.id.music_title);
+                mArtist = (TextView) view.findViewById(R.id.music_artist);
+                //mTxtDuration = (TextView) view.findViewById(R.id.txt_duration);
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds()); // 재생목록등록
+                        MusicApplication.getInstance().getServiceInterface().play(mPosition); // 선택한 오디오재생
+                        playPosition = mPosition;
+                        //notifyDataSetChanged();
+                        //mTitle.setTextColor(Color.parseColor("#e49292"));
+                        setNowPlaying(playPosition);
 
-                }
-            });
-        }
+                    }
+                });
+            }
 
         public void setAudioItem(AudioItem item, int position) {
             mItem = item;

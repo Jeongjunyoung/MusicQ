@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/memo_item_layout"
     android:layout_width="match_parent"
     android:layout_height="50dp"
@@ -8,23 +9,31 @@
 
     <LinearLayout
         android:id="@+id/list_id"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="95"
-        android:orientation="horizontal">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/playlist_name"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:id="@+id/add_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:singleLine="true"
+            android:textColor="#464646"
             android:text="TEXT"
-            android:textSize="30dp" />
-        <CheckBox
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="10"/>
+            android:textSize="25dp" />
+        <TextView
+            android:id="@+id/add_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TEXT"
+            android:textSize="15dp"
+            android:layout_marginLeft="10dp"
+            android:singleLine="true"/>
     </LinearLayout>
+    <CheckBox
+        android:id="@+id/add_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="8"/>
 </LinearLayout>

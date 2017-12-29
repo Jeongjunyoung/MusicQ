@@ -27,7 +27,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".PlayListActivity"></activity>
+        <activity android:name=".PlayListActivity" />
+        <activity android:name=".MusiclistForPlaylist"></activity>
     </application>
 
 </manifest>
