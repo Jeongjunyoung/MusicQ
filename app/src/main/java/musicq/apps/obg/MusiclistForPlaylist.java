@@ -113,7 +113,7 @@ public class MusiclistForPlaylist extends AppCompatActivity implements View.OnCl
         values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, "desc");
         values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, item.mId);
         resolver.insert(uri, values);
-        Log.d("PA", "SUCCESS....");
+        Log.d("PA", "SUCCESS.... : " + item.mId);
     }
 
     @Override

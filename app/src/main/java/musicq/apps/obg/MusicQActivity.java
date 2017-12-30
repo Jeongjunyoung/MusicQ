@@ -160,6 +160,8 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastActions.PREPARED);
         filter.addAction(BroadcastActions.PLAY_STATE_CHANGED);
+        filter.addAction(BroadcastActions.CHANGE_MUSIC_SONGA);
+        filter.addAction(BroadcastActions.CHANGE_MUSIC_PLMA);
         registerReceiver(mBroadcastReceiver, filter);
     }
     public void unregisterBroadcast(){

@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -22,6 +23,7 @@ public class MusicService extends Service {
     private boolean isPrepared;
     private ArrayList<Long> mAudioIds = new ArrayList<>();
     private int mCurrentPosition;
+    private String mListAdapter;
     private MusicAdapter.AudioItem mAudioItem;
     private MusicAdapter musicAdapter = new MusicAdapter(this, null);
     public class AudioServiceBinder extends Binder {
@@ -38,9 +40,19 @@ public class MusicService extends Service {
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
+                Log.d("SPL","CHECK");
                 isPrepared = true;
                 mp.start();
-                sendBroadcast(new Intent(BroadcastActions.PREPARED)); //prepared 전송
+                Intent intent = null;
+                        //new Intent(BroadcastActions.PREPARED);
+                if (mListAdapter.equals("PLMusicAdapter")) {
+                    intent = new Intent(BroadcastActions.CHANGE_MUSIC_PLMA);
+                } else if(mListAdapter.equals("SongAdapter")){
+                    intent = new Intent(BroadcastActions.CHANGE_MUSIC_SONGA);
+                }
+                intent.putExtra("position", mCurrentPosition);
+                sendBroadcast(intent);
+                //sendBroadcast(new Intent(BroadcastActions.PREPARED)); //prepared 전송
             }
         });
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -56,6 +68,14 @@ public class MusicService extends Service {
                 isPrepared = false;
                 sendBroadcast(new Intent(BroadcastActions.PLAY_STATE_CHANGED)); // 재생상태 변경 전송
                 return false;
+            }
+        });
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                Log.d("SER","Complete");
+                //MusicApplication.getInstance().getServiceInterface().forward();
+                forward();
             }
         });
     }
@@ -76,17 +96,19 @@ public class MusicService extends Service {
         }
     }
 
-    public void setPlayList(ArrayList<Long> audioIds) {
+    public void setPlayList(ArrayList<Long> audioIds, String setListAdapter) {
         if (mAudioIds.size() != audioIds.size()) {
             if (!mAudioIds.equals(audioIds)) {
                 mAudioIds.clear();
                 mAudioIds.addAll(audioIds);
+                mListAdapter = setListAdapter;
             }
         }
     }
     private void queryAudioItem(int position) {
         mCurrentPosition = position;
         long audioId = mAudioIds.get(position);
+        Log.d("AID", "" + audioId);
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String[] projection = new String[]{
                 MediaStore.Audio.Media._ID,
@@ -144,7 +166,7 @@ public class MusicService extends Service {
         } else {
             mCurrentPosition = 0; // 처음 포지션으로 이동.
         }
-        pass(mCurrentPosition);
+        //pass(mCurrentPosition);
         play(mCurrentPosition);
     }
 
@@ -166,8 +188,13 @@ public class MusicService extends Service {
     }
 
     public void pass(int position) {
-        Intent intent = new Intent(BroadcastActions.CHANGE_MUSIC);
+        /*Intent intent;
+        if (mListAdapter.equals("PLMusicAdapter")) {
+            intent = new Intent(BroadcastActions.CHANGE_MUSIC_PLMA);
+        } else {
+            intent = new Intent(BroadcastActions.CHANGE_MUSIC_SONGA);
+        }
         intent.putExtra("position", position);
-        sendBroadcast(intent);
+        sendBroadcast(intent);*/
     }
 }

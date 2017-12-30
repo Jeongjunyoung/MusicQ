@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -38,6 +39,7 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
     private static final int LOADER_ID = 0;
     private RecyclerView mRecyclerViewMusic;
     private PLMusicListAdapter mAdapterMusic;
+    ///private MusicAdapter mAdapterMusic;
     private String listName;
     private int mId;
     private int listId;
@@ -50,6 +52,11 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (intent.getIntExtra("position", 0) != 0) {
+                changeMusic(intent.getIntExtra("position", 0));
+            } else if(intent.getIntExtra("position", 0) == 0) {
+                changeMusic(0);
+            }
             updateUI();
         }
     };
@@ -59,6 +66,7 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_play_list);
         mRecyclerViewMusic = (RecyclerView) findViewById(R.id.playlist_music);
         mAdapterMusic = new PLMusicListAdapter(this, null);
+        //mAdapterMusic = new MusicAdapter(this, null);
         mRecyclerViewMusic.setAdapter(mAdapterMusic);
         LinearLayoutManager layoutManagerMusic = new LinearLayoutManager(this);
         layoutManagerMusic.setOrientation(LinearLayoutManager.VERTICAL);
@@ -162,9 +170,10 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
                         MediaStore.Audio.Media.ALBUM,
                         MediaStore.Audio.Media.ALBUM_ID,
                         MediaStore.Audio.Media.DURATION,
-                        MediaStore.Audio.Media.DATA
+                        MediaStore.Audio.Media.DATA,
+                        MediaStore.Audio.Playlists.Members.AUDIO_ID
                 };
-                String sortOder = MediaStore.Audio.Playlists.Members.PLAY_ORDER +" ASC";
+                String sortOder = MediaStore.Audio.Playlists.Members.PLAY_ORDER +" desc";
 
                 return new CursorLoader(getApplicationContext(), uri, projection, null, null, sortOder);
             }
@@ -196,10 +205,15 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
             mTitle.setText("재생중인 음악이 없습니다.");
         }
     }
+    public void changeMusic(int position) {
+        Log.d("change", "MUSIC : PLM");
+        mAdapterMusic.bottomUIChangeMusic(position);
+    }
     public void registerBroadcast(){
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastActions.PREPARED);
         filter.addAction(BroadcastActions.PLAY_STATE_CHANGED);
+        filter.addAction(BroadcastActions.CHANGE_MUSIC_PLMA);
         registerReceiver(mBroadcastReceiver, filter);
     }
     public void unregisterBroadcast(){

@@ -40,9 +40,9 @@ public class AudioServiceInterface {
         }
         return null;
     }
-    public void setPlayList(ArrayList<Long> audioIds) {
+    public void setPlayList(ArrayList<Long> audioIds, String setListAdapter) {
         if (mService != null) {
-            mService.setPlayList(audioIds);
+            mService.setPlayList(audioIds, setListAdapter);
         }
     }
 

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,13 +54,14 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
 
         public static AudioItem bindCursor(Cursor cursor) {
             AudioItem audioItem = new AudioItem();
-            audioItem.mId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns._ID));
+            audioItem.mId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns._ID ));
             audioItem.mAlbumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID));
             audioItem.mTitle = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE));
             audioItem.mArtist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST));
             audioItem.mAlbum = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM));
             audioItem.mDuration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION));
             audioItem.mDataPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA));
+            //Log.d("mID",""+cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID)));
             return audioItem;
         }
     }
@@ -68,6 +70,7 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
         ArrayList<Long> audioIds = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             audioIds.add(getItemId(i));
+            Log.d("GI", "" + getItemId(i));
         }
         return audioIds;
     }
@@ -88,7 +91,8 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds()); // 재생목록등록
+                        Log.d("ID", "" + mPosition);
+                        MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds(), "SongAdapter"); // 재생목록등록
                         MusicApplication.getInstance().getServiceInterface().play(mPosition); // 선택한 오디오재생
                         playPosition = mPosition;
                         //notifyDataSetChanged();
@@ -115,6 +119,8 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
     }
     public void setNowPlaying(int position) {
         AudioViewHolder audioViewHolder;
+
+        //Log.d("SNP", "position : " + position);
         for(int i=0;i<viewList.size();i++) {
             audioViewHolder = (AudioViewHolder) viewList.get(i);
             if (i == position) {

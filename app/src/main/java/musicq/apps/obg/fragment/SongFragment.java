@@ -139,12 +139,13 @@ public class SongFragment extends Fragment{
         unregisterBroadcast();
     }
     public void changeMusic(int position) {
-        Log.d("change", "MUSIC");
+        Log.d("change", "MUSIC : SONGF");
         mAdapter.bottomUIChangeMusic(position);
     }
     public void registerBroadcast(){
         IntentFilter filter = new IntentFilter();
-        filter.addAction(BroadcastActions.CHANGE_MUSIC);
+        filter.addAction(BroadcastActions.PREPARED);
+        filter.addAction(BroadcastActions.CHANGE_MUSIC_SONGA);
         getActivity().registerReceiver(mBroadcastReceiver, filter);
     }
     public void unregisterBroadcast(){
