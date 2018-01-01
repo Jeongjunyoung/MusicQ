@@ -89,5 +89,11 @@ public class AudioServiceInterface {
         return false;
     }
 
+    public int getNowPlayingPosition() {
+        if (mService != null) {
+            return mService.getPosition();
+        }
+        return 0;
+    }
 
 }

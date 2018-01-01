@@ -26,6 +26,7 @@ import java.util.List;
 
 import musicq.apps.obg.adapter.AddMusicListAdapter;
 import musicq.apps.obg.adapter.MusicAdapter;
+import musicq.apps.obg.service.BroadcastActions;
 
 public class MusiclistForPlaylist extends AppCompatActivity implements View.OnClickListener{
     private static final int LOADER_ID = 0;
@@ -130,11 +131,14 @@ public class MusiclistForPlaylist extends AppCompatActivity implements View.OnCl
                 for(int i=0;i<items.size();i++) {
                     MusicAdapter.AudioItem audioItem = items.get(i);
                     insertMusicInPlayList(audioItem);
-                    finish();
                     //Log.d("PA", "ID : " + audioItem.mId);
                     //Log.d("PA", "TITLE : " + audioItem.mTitle);
-                    break;
                 }
+                Intent intent = new Intent(BroadcastActions.INSERT_PLAYLIST_MUSIC);
+                intent.putExtra("insertMusic", "insert");
+                sendBroadcast(intent);
+                finish();
+                break;
         }
     }
 }

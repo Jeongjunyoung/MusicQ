@@ -9,4 +9,5 @@ public class BroadcastActions {
     public final static String PLAY_STATE_CHANGED = "PLAY_STATE_CHANGED";
     public final static String CHANGE_MUSIC_SONGA = "CHANGE_MUSIC_SONGA";
     public final static String CHANGE_MUSIC_PLMA = "CHANGE_MUSIC_PLMA";
+    public final static String INSERT_PLAYLIST_MUSIC = "INSERT_PLAYLIST_MUSIC";
 }

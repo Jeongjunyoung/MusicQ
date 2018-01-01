@@ -37,6 +37,7 @@ import musicq.apps.obg.service.MusicApplication;
 
 public class PlayListActivity extends AppCompatActivity implements View.OnClickListener{
     private static final int LOADER_ID = 0;
+    private static int mNowPlaying;
     private RecyclerView mRecyclerViewMusic;
     private PLMusicListAdapter mAdapterMusic;
     ///private MusicAdapter mAdapterMusic;
@@ -54,6 +55,10 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
         public void onReceive(Context context, Intent intent) {
             if (intent.getIntExtra("position", 0) != 0) {
                 changeMusic(intent.getIntExtra("position", 0));
+            } else if (intent.getStringExtra("insertMusic") != null) {
+                Log.d("IM", "InsertMusic");
+                getMusicListInPlayList();
+                mAdapterMusic.notifyDataSetChanged();
             } else if(intent.getIntExtra("position", 0) == 0) {
                 changeMusic(0);
             }
@@ -214,6 +219,7 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
         filter.addAction(BroadcastActions.PREPARED);
         filter.addAction(BroadcastActions.PLAY_STATE_CHANGED);
         filter.addAction(BroadcastActions.CHANGE_MUSIC_PLMA);
+        filter.addAction(BroadcastActions.INSERT_PLAYLIST_MUSIC);
         registerReceiver(mBroadcastReceiver, filter);
     }
     public void unregisterBroadcast(){

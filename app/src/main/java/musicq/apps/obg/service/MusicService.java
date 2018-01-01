@@ -197,4 +197,8 @@ public class MusicService extends Service {
         intent.putExtra("position", position);
         sendBroadcast(intent);*/
     }
+
+    public int getPosition() {
+        return mCurrentPosition;
+    }
 }
