@@ -38,7 +38,17 @@ public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.V
         PLMusicListAdapter.AudioItemList audioItem = PLMusicListAdapter.AudioItemList.bindCursor(cursor);
         if (audioItem != null) {
             ((PLMusicListAdapter.AudioViewHolder) viewHolder).setAudioItem(audioItem, cursor.getPosition());
-            viewList.add((PLMusicListAdapter.AudioViewHolder) viewHolder);
+            /*boolean isDup = false;
+            for(int i=0;i<viewList.size();i++) {
+                if (viewList.get(i).mItem.mId == ((PLMusicListAdapter.AudioViewHolder) viewHolder).mItem.mId) {
+                    Log.d("PLMA","onBindViewHolder() >> find");
+                    isDup = true;
+                    break;
+                }
+            }*/
+            //if (!isDup) {
+                viewList.add((PLMusicListAdapter.AudioViewHolder) viewHolder);
+            //}
         }
     }
 
@@ -49,6 +59,7 @@ public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.V
     }
     public ArrayList<Long> getAudioIds() {
         count = getItemCount();
+        Log.d("PLMA", "getAudioIds() >> count : " + count);
         ArrayList<Long> audioIds = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             audioIds.add(viewList.get(i).mItem.mId);
@@ -118,7 +129,7 @@ public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.V
     }
     public void setNowPlaying(int position) {
         PLMusicListAdapter.AudioViewHolder audioViewHolder;
-        Log.d("SNP", "position : " + position);
+        Log.d("PLMA", "setNowPlaying() : " + position);
         for(int i=0;i<viewList.size();i++) {
             audioViewHolder = (PLMusicListAdapter.AudioViewHolder) viewList.get(i);
             if (i == position) {
@@ -131,5 +142,12 @@ public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.V
     public void bottomUIChangeMusic(int i) {
         playPosition = i;
         setNowPlaying(i);
+    }
+
+    public void setPlayingAudios() {
+        MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds(), "PLMusicAdapter");
+        Log.d("PLMA", "setPlayingAudios() >> position : "+playPosition);
+        //playPosition = MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition();
+        Log.d("PLMA", "setPlayingAudios() >> position : "+playPosition);
     }
 }

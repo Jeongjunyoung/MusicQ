@@ -134,9 +134,13 @@ public class MusiclistForPlaylist extends AppCompatActivity implements View.OnCl
                     //Log.d("PA", "ID : " + audioItem.mId);
                     //Log.d("PA", "TITLE : " + audioItem.mTitle);
                 }
-                Intent intent = new Intent(BroadcastActions.INSERT_PLAYLIST_MUSIC);
+                /*Intent intent = new Intent(BroadcastActions.INSERT_PLAYLIST_MUSIC);
                 intent.putExtra("insertMusic", "insert");
-                sendBroadcast(intent);
+                sendBroadcast(intent);*/
+                Intent intent = new Intent(this, PlayListActivity.class);
+                intent.putExtra("name", listName);
+                intent.putExtra("isInsert", true);
+                startActivity(intent);
                 finish();
                 break;
         }

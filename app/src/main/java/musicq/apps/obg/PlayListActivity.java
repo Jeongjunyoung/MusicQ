@@ -57,8 +57,10 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
                 changeMusic(intent.getIntExtra("position", 0));
             } else if (intent.getStringExtra("insertMusic") != null) {
                 Log.d("IM", "InsertMusic");
-                getMusicListInPlayList();
-                mAdapterMusic.notifyDataSetChanged();
+                /*getMusicListInPlayList();*/
+                //mAdapterMusic.notifyDataSetChanged();
+                //mAdapterMusic.setPlayingAudios();
+                //recreate();
             } else if(intent.getIntExtra("position", 0) == 0) {
                 changeMusic(0);
             }
@@ -86,6 +88,10 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
         Intent intent = getIntent();
         listName = intent.getStringExtra("name");
         mId = intent.getIntExtra("id", 0);
+        /*if (intent.getBooleanExtra("isInsert", false)) {
+            Log.d("PLA", "getBooleanExtra() >> true");
+            mAdapterMusic.setPlayingAudios();
+        }*/
         String str = listName + " : " + String.valueOf(mId);
         listTitle.setText(str);
         musicListBtn.setOnClickListener(this);
@@ -101,11 +107,13 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
                 // READ_EXTERNAL_STORAGE 에 대한 권한이 있음.
                 //getAudioListFromMediaDatabase();
                 getMusicListInPlayList();
+                //mAdapterMusic.setPlayingAudios();
             }
         }
         else{
             //getAudioListFromMediaDatabase();
             getMusicListInPlayList();
+            //mAdapterMusic.setPlayingAudios();
         }
         registerBroadcast();
         updateUI();
@@ -125,6 +133,7 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
                     Intent intent = new Intent(getApplicationContext(), MusiclistForPlaylist.class);
                     intent.putExtra("listName", listName);
                     startActivity(intent);
+                    finish();
                     break;
                 case R.id.bottom_player_playlist:
                     // 플레이어 화면으로 이동할 코드가 들어갈 예정
@@ -139,6 +148,7 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
                     break;
                 case R.id.btn_forward_playlist:
                     // 다음곡으로 이동
+                    MusicApplication.getInstance().getServiceInterface().setPlayList(mAdapterMusic.getAudioIds(),"PLMusicAdapter");
                     MusicApplication.getInstance().getServiceInterface().forward();
                     break;
             }
@@ -150,6 +160,7 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
             // READ_EXTERNAL_STORAGE 에 대한 권한 획득.
             //getAudioListFromMediaDatabase();
             getMusicListInPlayList();
+            //mAdapterMusic.setPlayingAudios();
         }
     }
 

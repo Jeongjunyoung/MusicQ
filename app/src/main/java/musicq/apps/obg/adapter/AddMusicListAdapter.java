@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,18 @@ public class AddMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.
         MusicAdapter.AudioItem audioItem = MusicAdapter.AudioItem.bindCursor(cursor);
         if (audioItem != null) {
             ((AudioViewHolder) viewHolder).setAudioItem(audioItem,cursor.getPosition());
-            viewList.add((AudioViewHolder) viewHolder);
+            //viewList.clear();
+            boolean isDup = false;
+            for(int i=0;i<viewList.size();i++) {
+                if (viewList.get(i).mItem.mId == ((AudioViewHolder) viewHolder).mItem.mId) {
+                    //Log.d("ADDMA","onBindViewHolder() >> find");
+                    isDup = true;
+                }
+            }
+            if (!isDup) {
+                viewList.add((AudioViewHolder) viewHolder);
+            }
+            //Log.d("ADDMA","onBindViewHolder() >> viewList.add() Call");
         }
     }
 
@@ -84,7 +96,6 @@ public class AddMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.
     }
 
     public List<MusicAdapter.AudioItem> getCheckedIds() {
-        //ArrayList<Long> checkIds = new ArrayList<>();
         AudioViewHolder audioViewHolder;
         ArrayList<MusicAdapter.AudioItem> items = new ArrayList<>();
         for(int i=0; i<viewList.size(); i++) {
@@ -94,7 +105,7 @@ public class AddMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.
                 //checkIds.add(items.mId);
             }
         }
-        //Long[] arrLong = (Long[]) checkIds.toArray(new Long[0]);
+        //Long[] arrLong = (Long[]) checkIds.toArdray(new Long[0]);
         return  items;
     }
 }

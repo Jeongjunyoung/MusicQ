@@ -16,6 +16,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import musicq.apps.obg.adapter.MusicAdapter;
+import musicq.apps.obg.adapter.PLMusicListAdapter;
 
 public class MusicService extends Service {
     private final IBinder mBinder = new AudioServiceBinder();
@@ -26,6 +27,7 @@ public class MusicService extends Service {
     private String mListAdapter;
     private MusicAdapter.AudioItem mAudioItem;
     private MusicAdapter musicAdapter = new MusicAdapter(this, null);
+    private PLMusicListAdapter playMusicAdapter = new PLMusicListAdapter(this, null);
     public class AudioServiceBinder extends Binder {
         public MusicService getService() {
             return MusicService.this;
@@ -75,6 +77,7 @@ public class MusicService extends Service {
             public void onCompletion(MediaPlayer mediaPlayer) {
                 Log.d("SER","Complete");
                 //MusicApplication.getInstance().getServiceInterface().forward();
+                setPlayList(playMusicAdapter.getAudioIds(),"PLMusicAdapter");
                 forward();
             }
         });
@@ -162,8 +165,10 @@ public class MusicService extends Service {
     }
     public void forward() {
         if (mAudioIds.size() - 1 > mCurrentPosition) {
+            Log.d("MS", "forward() >> Next");
             mCurrentPosition++; // 다음 포지션으로 이동.
         } else {
+            Log.d("MS", "forward() >> First");
             mCurrentPosition = 0; // 처음 포지션으로 이동.
         }
         //pass(mCurrentPosition);
