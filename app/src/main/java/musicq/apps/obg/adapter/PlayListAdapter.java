@@ -31,7 +31,7 @@ public class PlayListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int i) {
+    public PlayListVO getItem(int i) {
         return items.get(i);
     }
 
@@ -73,6 +73,14 @@ public class PlayListAdapter extends BaseAdapter {
         items.add(vo);
     }
 
+    public void removeItem(String listName) {
+        for(int i=0;i< items.size();i++) {
+            if (items.get(i).getListName().equals(listName)) {
+                items.remove(i);
+                convertViewList.remove(i);
+            }
+        }
+    }
     public void itemClear() {
         items.clear();
     }

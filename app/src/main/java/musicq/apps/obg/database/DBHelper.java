@@ -71,9 +71,14 @@ public class DBHelper {
         String sql = "insert into playlist(list_name) values(?)";
         Object[] params = {listName};
         db.execSQL(sql, params);
-        Log.d("OBG", "INSERT SUCCESS");
+        //Log.d("OBG", "INSERT SUCCESS");
     }
 
+    public void remove(String listName) {
+        String sql = "delete from playlist where list_name = ?";
+        Object[] params = {listName};
+        db.execSQL(sql, params);
+    }
     public void playListMusicInsert(int listId, MusicAdapter.AudioItem items) {
         /*"music_title text, music_id long," +
                 "music_artist text, music_albumid long,music_album text, music_duration long, music_datapath text,*/

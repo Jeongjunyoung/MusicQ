@@ -77,8 +77,9 @@ public class MusicService extends Service {
             public void onCompletion(MediaPlayer mediaPlayer) {
                 Log.d("SER","Complete");
                 //MusicApplication.getInstance().getServiceInterface().forward();
-                setPlayList(playMusicAdapter.getAudioIds(),"PLMusicAdapter");
-                forward();
+                Intent intent = new Intent(BroadcastActions.SET_AUDIO_IDS);
+                intent.putExtra("setIds", "setIds");
+                sendBroadcast(intent);
             }
         });
     }

@@ -1,13 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_blue_bright">
+    android:background="@android:color/holo_green_dark">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/youtube_playing"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Youtube"
         android:textSize="40dp"/>
+    <FrameLayout
+        android:id="@+id/youtube_layout"
+        android:layout_width="match_parent"
+        android:layout_height="166dp"
+        android:layout_centerHorizontal="true"
+        android:visibility="visible">
+    </FrameLayout>
+    <!--<view
+        android:id="@+id/youtube_view"
+        class="com.google.android.youtube.player.YouTubePlayerView"
+        id="@+id/view"
+        layout_width="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="235dp"/>-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <Button
+            android:id="@+id/youtube_prev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Prev"
+            android:layout_gravity="center"/>
+        <Button
+            android:id="@+id/youtube_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Play"
+            android:layout_gravity="center"/>
+        <Button
+            android:id="@+id/youtube_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:layout_gravity="center"/>
+    </LinearLayout>
+
+
+    <ListView
+        android:id="@+id/top100_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#a0bbc2">
+    </ListView>
 </LinearLayout>

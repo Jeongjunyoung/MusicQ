@@ -55,8 +55,9 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
         public void onReceive(Context context, Intent intent) {
             if (intent.getIntExtra("position", 0) != 0) {
                 changeMusic(intent.getIntExtra("position", 0));
-            } else if (intent.getStringExtra("insertMusic") != null) {
-                Log.d("IM", "InsertMusic");
+            } else if (intent.getStringExtra("setIds") != null) {
+                Log.d("SET", "setIds");
+                setAudioList();
                 /*getMusicListInPlayList();*/
                 //mAdapterMusic.notifyDataSetChanged();
                 //mAdapterMusic.setPlayingAudios();
@@ -87,12 +88,12 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
         mPlayBtn = (ImageButton) findViewById(R.id.btn_play_pause_playlist);
         Intent intent = getIntent();
         listName = intent.getStringExtra("name");
-        mId = intent.getIntExtra("id", 0);
+        //mId = intent.getIntExtra("id", 0);
         /*if (intent.getBooleanExtra("isInsert", false)) {
             Log.d("PLA", "getBooleanExtra() >> true");
             mAdapterMusic.setPlayingAudios();
         }*/
-        String str = listName + " : " + String.valueOf(mId);
+        String str = listName;
         listTitle.setText(str);
         musicListBtn.setOnClickListener(this);
         //findViewById(R.id.bottom_player_playlist).setOnClickListener(this);
@@ -148,8 +149,8 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
                     break;
                 case R.id.btn_forward_playlist:
                     // 다음곡으로 이동
-                    MusicApplication.getInstance().getServiceInterface().setPlayList(mAdapterMusic.getAudioIds(),"PLMusicAdapter");
-                    MusicApplication.getInstance().getServiceInterface().forward();
+                    setAudioList();
+
                     break;
             }
     }
@@ -205,6 +206,11 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
             }
         });
     }
+
+    private void setAudioList() {
+        MusicApplication.getInstance().getServiceInterface().setPlayList(mAdapterMusic.getAudioIds(),"PLMusicAdapter");
+        MusicApplication.getInstance().getServiceInterface().forward();
+    }
     private void updateUI() {
         if (MusicApplication.getInstance().getServiceInterface().isPlaying()) {
             mPlayBtn.setImageResource(R.drawable.pause_icon);
@@ -230,10 +236,11 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
         filter.addAction(BroadcastActions.PREPARED);
         filter.addAction(BroadcastActions.PLAY_STATE_CHANGED);
         filter.addAction(BroadcastActions.CHANGE_MUSIC_PLMA);
-        filter.addAction(BroadcastActions.INSERT_PLAYLIST_MUSIC);
+        filter.addAction(BroadcastActions.SET_AUDIO_IDS);
         registerReceiver(mBroadcastReceiver, filter);
     }
     public void unregisterBroadcast(){
         unregisterReceiver(mBroadcastReceiver);
     }
+
 }
