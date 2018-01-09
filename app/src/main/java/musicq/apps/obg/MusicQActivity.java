@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -24,8 +25,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -45,13 +51,22 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
     private static final int LOADER_ID = 0;
     private static final String TAG = "MAIN";
     private static String FRAGMENT_TAG = "PLAYING_FRAGMENT";
-    private TextView mTitle;
+    private TextView mTitle, title;
+    private SeekBar seekBar;
+    private ImageView mAlbumArt, album;
     private ImageButton mPlayBtn;
     private MusicAdapter mAdapter;
+    private LinearLayout playingLayout;
+    private ProgressUpdate progressUpdate;
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             updateUI();
+            /*if (!(progressUpdate.isAlive())) {
+                Log.d("MAIN","progressUpdate().start() 호출");
+                progressUpdate.start();
+            }*/
+            new ProgressUpdate().start();
         }
     };
     @Override
@@ -63,7 +78,12 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         playingMusicFragment = new PlayingMusicFragment();
         mAdapter = new MusicAdapter(this, null);
         mTitle = (TextView) findViewById(R.id.txt_title);
+        title = (TextView) findViewById(R.id.title);
+        seekBar = (SeekBar) findViewById(R.id.seekbar);
+        mAlbumArt = (ImageView) findViewById(R.id.album_image);
+        album = (ImageView) findViewById(R.id.album);
         mPlayBtn = (ImageButton) findViewById(R.id.btn_play_pause);
+        playingLayout = (LinearLayout) findViewById(R.id.playing_layout);
         dbHelper = new DBHelper(this);
         dbHelper.open();
         findViewById(R.id.bottom_player).setOnClickListener(this);
@@ -110,6 +130,27 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
 
             }
         });
+
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                MusicApplication.getInstance().getServiceInterface().pause();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                MusicApplication.getInstance().getServiceInterface().seekTo(seekBar.getProgress());
+                if (seekBar.getProgress() > 0 && MusicApplication.getInstance().getServiceInterface().isPlaying()) {
+                    MusicApplication.getInstance().getServiceInterface().play();
+                }
+            }
+        });
         registerBroadcast();
         updateUI();
     }
@@ -124,6 +165,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         switch (view.getId()) {
             case R.id.bottom_player:
                 // 플레이어 화면으로 이동할 코드가 들어갈 예정
+                playingLayout.setVisibility(View.VISIBLE);
                 break;
             case R.id.btn_rewind:
                 // 이전곡으로 이동
@@ -141,6 +183,8 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void updateUI() {
+        seekBar.setProgress(0);
+        seekBar.setMax(MusicApplication.getInstance().getServiceInterface().getDuration());
         if (MusicApplication.getInstance().getServiceInterface().isPlaying()) {
             mPlayBtn.setImageResource(R.drawable.pause_icon);
         } else {
@@ -149,11 +193,14 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         MusicAdapter.AudioItem audioItem = MusicApplication.getInstance().getServiceInterface().getAudioItem();
         if (audioItem != null) {
             Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), audioItem.mAlbumId);
-            //Picasso.with(getApplicationContext()).load(albumArtUri).error(R.drawable.empty_albumart).into(mImgAlbumArt);
+            //Picasso.with(getApplicationContext()).load(albumArtUri).error(R.drawable.album_default_icon).into(mAlbumArt);
+            Picasso.with(getApplicationContext()).load(albumArtUri).error(R.drawable.album_default_icon).into(album);
             mTitle.setText(audioItem.mTitle);
+            title.setText(audioItem.mTitle);
         } else {
             //mImgAlbumArt.setImageResource(R.drawable.empty_albumart);
             mTitle.setText("재생중인 음악이 없습니다.");
+            title.setText("재생중인 음악이 없습니다.");
         }
     }
     public void registerBroadcast(){
@@ -167,4 +214,32 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
     public void unregisterBroadcast(){
         unregisterReceiver(mBroadcastReceiver);
     }
+
+    class ProgressUpdate extends Thread{
+        @Override
+        public void run() {
+            while(MusicApplication.getInstance().getServiceInterface().isPlaying()){
+                try {
+                    Thread.sleep(500);
+                    if (MusicApplication.getInstance().getServiceInterface().isMediaAlive()) {
+                        Log.d("MAIN","Current : " + MusicApplication.getInstance().getServiceInterface().getCurrentPosition());
+                        seekBar.setProgress(MusicApplication.getInstance().getServiceInterface().getCurrentPosition());
+                    }
+                } catch (Exception e) {
+                    Log.d("ProgressUpdate",e.getMessage());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (playingLayout.getVisibility() == View.VISIBLE) {
+            playingLayout.setVisibility(View.GONE);
+        }
+    }
+    /*Playing Layout 에서 목록으로
+    * Playing Layout 에서 Control 기능
+    * */
 }

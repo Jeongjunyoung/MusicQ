@@ -207,4 +207,23 @@ public class MusicService extends Service {
     public int getPosition() {
         return mCurrentPosition;
     }
+
+    public int getCurrentPosition(){
+        return mMediaPlayer.getCurrentPosition();
+    }
+
+    public int getDuration() {
+        return mMediaPlayer.getDuration();
+    }
+
+    public void seekTo(int position){
+        mMediaPlayer.seekTo(position);
+    }
+
+    public Boolean isMediaAlive() {
+        if (mMediaPlayer == null) {
+            return false;
+        }
+        return true;
+    }
 }

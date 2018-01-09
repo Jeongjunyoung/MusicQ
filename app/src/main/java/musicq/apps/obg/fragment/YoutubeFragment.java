@@ -167,6 +167,7 @@ public class YoutubeFragment extends Fragment implements YouTubePlayer.OnInitial
     public void setPlayingVideo() {
         Log.d("YOU", "setPlayingVideo()  : 호출, position : " + mPlayingPosition);
         Top100VO vo = (Top100VO) listAdapter.getItem(mPlayingPosition);
+        listAdapter.setPlayingTitle(mPlayingPosition);
         //videoKey = listAdapter.getVideoId(mPlayingPosition);
         playingTitle.setText(vo.getTitle().toString());
         mPlayer.loadVideo(vo.getVideoId());

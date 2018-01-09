@@ -32,17 +32,17 @@ public class PlayingActivity extends AppCompatActivity implements View.OnClickLi
     private ContentResolver res;
     private ProgressUpdate progressUpdate;
     private int position;
-    public static Context mContext;
+    //public static Context mContext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
-        mContext = this;
+        //mContext = this;
         //Intent intent = getIntent();
         mediaPlayer = new MediaPlayer();
         title = (TextView)findViewById(R.id.title);
         album = (ImageView)findViewById(R.id.album);
-        //seekBar = (SeekBar)findViewById(R.id.seekbar);
+        seekBar = (SeekBar)findViewById(R.id.seekbar);
 
         //position = intent.getIntExtra("position",0);
         //list = (ArrayList<MusicVO>) intent.getSerializableExtra("playlist");
@@ -56,9 +56,9 @@ public class PlayingActivity extends AppCompatActivity implements View.OnClickLi
         play.setOnClickListener(this);
         pause.setOnClickListener(this);
         next.setOnClickListener(this);
-        /*playMusic(list.get(position));
+        playMusic(list.get(position));
         progressUpdate = new ProgressUpdate();
-        progressUpdate.start();*/
+        //progressUpdate.start();
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -183,19 +183,7 @@ public class PlayingActivity extends AppCompatActivity implements View.OnClickLi
                 } catch (Exception e) {
                     Log.d("ProgressUpdate",e.getMessage());
                 }
-
             }
         }
-    }
-
-    public void clickStartMusic(int i, ArrayList<MusicVO> mList) {
-        position = i;
-        list = mList;
-        Log.d("PMF", "" + i);
-        //seekBar = (SeekBar)findViewById(R.id.seekbar);
-        playMusic(list.get(position));
-        progressUpdate = new ProgressUpdate();
-        progressUpdate.start();
-
     }
 }

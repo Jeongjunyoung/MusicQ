@@ -2,8 +2,6 @@ package musicq.apps.obg.service;
 
 import android.app.Application;
 
-import musicq.apps.obg.AudioServiceInterface;
-
 
 public class MusicApplication extends Application {
     private static MusicApplication mInstance;

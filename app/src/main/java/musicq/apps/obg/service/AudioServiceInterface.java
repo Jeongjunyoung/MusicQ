@@ -1,4 +1,4 @@
-package musicq.apps.obg;
+package musicq.apps.obg.service;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -96,4 +96,30 @@ public class AudioServiceInterface {
         return 0;
     }
 
+    public int getCurrentPosition() {
+        if (mService != null) {
+            return mService.getCurrentPosition();
+        }
+        return 0;
+    }
+
+    public int getDuration() {
+        if (mService != null) {
+            return mService.getDuration();
+        }
+        return 0;
+    }
+
+    public void seekTo(int position) {
+        if (mService != null) {
+            mService.seekTo(position);
+        }
+    }
+
+    public boolean isMediaAlive() {
+        if (mService != null) {
+            return mService.isMediaAlive();
+        }
+        return false;
+    }
 }
