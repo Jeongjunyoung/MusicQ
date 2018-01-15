@@ -155,13 +155,15 @@ public class MusicService extends Service {
     public void play() {
         if (isPrepared) {
             mMediaPlayer.start();
-            sendBroadcast(new Intent(BroadcastActions.PLAY_STATE_CHANGED)); // 재생상태 변경 전송
+            sendPlayPauseState();
+            //sendBroadcast(new Intent(BroadcastActions.PLAY_STATE_CHANGED)); // 재생상태 변경 전송
         }
     }
     public void pause() {
         if (isPrepared) {
             mMediaPlayer.pause();
-            sendBroadcast(new Intent(BroadcastActions.PLAY_STATE_CHANGED)); // 재생상태 변경 전송
+            sendPlayPauseState();
+            //sendBroadcast(new Intent(BroadcastActions.PLAY_STATE_CHANGED)); // 재생상태 변경 전송
         }
     }
     public void forward() {
@@ -182,7 +184,7 @@ public class MusicService extends Service {
         } else {
             mCurrentPosition = mAudioIds.size() - 1; // 마지막 포지션으로 이동.
         }
-        pass(mCurrentPosition);
+        //pass(mCurrentPosition);
         play(mCurrentPosition);
     }
     public MusicAdapter.AudioItem getAudioItem() {
@@ -220,10 +222,18 @@ public class MusicService extends Service {
         mMediaPlayer.seekTo(position);
     }
 
+    public ArrayList<Long> getAudioIds() {
+        return mAudioIds;
+    }
     public Boolean isMediaAlive() {
         if (mMediaPlayer == null) {
             return false;
         }
         return true;
+    }
+    public void sendPlayPauseState() {
+        Intent intent = new Intent(BroadcastActions.PLAY_STATE_CHANGED);
+        intent.putExtra("ppBtn", "ppBtn");
+        sendBroadcast(intent);
     }
 }

@@ -1,25 +1,14 @@
 package musicq.apps.obg;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.media.Image;
 import android.net.Uri;
-import android.os.Build;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,12 +18,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
-
+import musicq.apps.obg.adapter.AlbumPagerAdapter;
 import musicq.apps.obg.adapter.MusicAdapter;
 import musicq.apps.obg.database.DBHelper;
 import musicq.apps.obg.fragment.MusicListFragment;
@@ -48,20 +35,27 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
     MusicListFragment musicListFragment;
     PlayingMusicFragment playingMusicFragment;
     DBHelper dbHelper;
+    AlbumPagerAdapter pagerAdapter;
     private static final int LOADER_ID = 0;
     private static final String TAG = "MAIN";
     private static String FRAGMENT_TAG = "PLAYING_FRAGMENT";
-    private TextView mTitle, title;
+    private TextView mTitle, title, mDuration;
     private SeekBar seekBar;
     private ImageView mAlbumArt, album;
-    private ImageButton mPlayBtn;
+    private ImageButton mPlayBtn, play;
     private MusicAdapter mAdapter;
     private LinearLayout playingLayout;
     private ProgressUpdate progressUpdate;
+    private ViewPager viewPager;
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            updateUI();
+            if (intent.getStringExtra("ppBtn") != null) {
+                updatePPBtn();
+            } else {
+                updateUI();
+            }
+
             /*if (!(progressUpdate.isAlive())) {
                 Log.d("MAIN","progressUpdate().start() 호출");
                 progressUpdate.start();
@@ -79,16 +73,24 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         mAdapter = new MusicAdapter(this, null);
         mTitle = (TextView) findViewById(R.id.txt_title);
         title = (TextView) findViewById(R.id.title);
+        mDuration = (TextView) findViewById(R.id.music_duration);
         seekBar = (SeekBar) findViewById(R.id.seekbar);
         mAlbumArt = (ImageView) findViewById(R.id.album_image);
         album = (ImageView) findViewById(R.id.album);
         mPlayBtn = (ImageButton) findViewById(R.id.btn_play_pause);
+        play = (ImageButton) findViewById(R.id.play);
         playingLayout = (LinearLayout) findViewById(R.id.playing_layout);
+        viewPager = (ViewPager) findViewById(R.id.music_pager);
+        pagerAdapter = new AlbumPagerAdapter(getLayoutInflater());
         dbHelper = new DBHelper(this);
+        viewPager.setAdapter(pagerAdapter);
         dbHelper.open();
         findViewById(R.id.bottom_player).setOnClickListener(this);
         findViewById(R.id.btn_rewind).setOnClickListener(this);
+        findViewById(R.id.pre).setOnClickListener(this);
+        findViewById(R.id.next).setOnClickListener(this);
         mPlayBtn.setOnClickListener(this);
+        play.setOnClickListener(this);
         findViewById(R.id.btn_forward).setOnClickListener(this);
         FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
         getSupportFragmentManager().beginTransaction().add(R.id.container, youtubeFragment).commit();
@@ -135,20 +137,45 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
+                if (b) {
+                    MusicApplication.getInstance().getServiceInterface().seekTo(i);
+                }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                MusicApplication.getInstance().getServiceInterface().pause();
+                //MusicApplication.getInstance().getServiceInterface().pause();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                MusicApplication.getInstance().getServiceInterface().seekTo(seekBar.getProgress());
+                /*MusicApplication.getInstance().getServiceInterface().seekTo(seekBar.getProgress());
                 if (seekBar.getProgress() > 0 && MusicApplication.getInstance().getServiceInterface().isPlaying()) {
                     MusicApplication.getInstance().getServiceInterface().play();
+                }*/
+            }
+        });
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            int mState = 0;
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                int mPosition =  MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition();
+                Log.d("MAIN", "PagerListener() >> position : "+position + ", mPosition : "+ mPosition + ", mState : "+mState);
+                if (position > mPosition && mState == 2) {
+                    MusicApplication.getInstance().getServiceInterface().forward();
+                } else if(position < mPosition && mState == 2){
+                    MusicApplication.getInstance().getServiceInterface().rewind();
                 }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                mState = state;
             }
         });
         registerBroadcast();
@@ -170,6 +197,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.btn_rewind:
                 // 이전곡으로 이동
                 MusicApplication.getInstance().getServiceInterface().rewind();
+                viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
                 break;
             case R.id.btn_play_pause:
                 // 재생 또는 일시정지
@@ -178,6 +206,18 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.btn_forward:
                 // 다음곡으로 이동
                 MusicApplication.getInstance().getServiceInterface().forward();
+                viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
+                break;
+            case R.id.play:
+                MusicApplication.getInstance().getServiceInterface().togglePlay();
+                break;
+            case R.id.pre:
+                MusicApplication.getInstance().getServiceInterface().rewind();
+                viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition(),true);
+                break;
+            case R.id.next:
+                MusicApplication.getInstance().getServiceInterface().forward();
+                viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition(),true);
                 break;
         }
     }
@@ -185,22 +225,44 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
     private void updateUI() {
         seekBar.setProgress(0);
         seekBar.setMax(MusicApplication.getInstance().getServiceInterface().getDuration());
+        pagerAdapter.setAudioIds();
+        pagerAdapter.notifyDataSetChanged();
+        viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
         if (MusicApplication.getInstance().getServiceInterface().isPlaying()) {
             mPlayBtn.setImageResource(R.drawable.pause_icon);
+            play.setImageResource(R.drawable.pause_icon);
         } else {
             mPlayBtn.setImageResource(R.drawable.play_icon);
+            play.setImageResource(R.drawable.play_icon);
         }
         MusicAdapter.AudioItem audioItem = MusicApplication.getInstance().getServiceInterface().getAudioItem();
         if (audioItem != null) {
             Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), audioItem.mAlbumId);
             //Picasso.with(getApplicationContext()).load(albumArtUri).error(R.drawable.album_default_icon).into(mAlbumArt);
-            Picasso.with(getApplicationContext()).load(albumArtUri).error(R.drawable.album_default_icon).into(album);
+            //Picasso.with(getApplicationContext()).load(albumArtUri).error(R.drawable.album_default_icon).into(album);
             mTitle.setText(audioItem.mTitle);
             title.setText(audioItem.mTitle);
+            int sec_duration = (int)audioItem.mDuration / 1000;
+            Log.d("MAIN", "Minutes : " + sec_duration/60 + "Seconds : " + sec_duration%60);
+            Log.d("MAIN", "Duration : " + setDuration(sec_duration/60, sec_duration%60));
+
+            //mDuration.setText();
         } else {
             //mImgAlbumArt.setImageResource(R.drawable.empty_albumart);
             mTitle.setText("재생중인 음악이 없습니다.");
             title.setText("재생중인 음악이 없습니다.");
+        }
+    }
+
+    private void updatePPBtn() {
+        /*seekBar.setProgress(0);
+        seekBar.setMax(MusicApplication.getInstance().getServiceInterface().getDuration());*/
+        if (MusicApplication.getInstance().getServiceInterface().isPlaying()) {
+            mPlayBtn.setImageResource(R.drawable.pause_icon);
+            play.setImageResource(R.drawable.pause_icon);
+        } else {
+            mPlayBtn.setImageResource(R.drawable.play_icon);
+            play.setImageResource(R.drawable.play_icon);
         }
     }
     public void registerBroadcast(){
@@ -222,7 +284,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
                 try {
                     Thread.sleep(500);
                     if (MusicApplication.getInstance().getServiceInterface().isMediaAlive()) {
-                        Log.d("MAIN","Current : " + MusicApplication.getInstance().getServiceInterface().getCurrentPosition());
+                        //Log.d("MAIN","Current : " + MusicApplication.getInstance().getServiceInterface().getCurrentPosition());
                         seekBar.setProgress(MusicApplication.getInstance().getServiceInterface().getCurrentPosition());
                     }
                 } catch (Exception e) {
@@ -231,13 +293,24 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
     }
-
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         if (playingLayout.getVisibility() == View.VISIBLE) {
             playingLayout.setVisibility(View.GONE);
+        } else {
+            super.onBackPressed();
         }
+    }
+
+    public String setDuration(int minutes, int seconds) {
+        String minutesStr = String.valueOf(minutes);
+        String secondsStr = "";
+        if (seconds < 10) {
+            secondsStr = "0" + String.valueOf(seconds);
+        } else {
+            secondsStr = String.valueOf(seconds);
+        }
+        return minutesStr + ":" + secondsStr;
     }
     /*Playing Layout 에서 목록으로
     * Playing Layout 에서 Control 기능

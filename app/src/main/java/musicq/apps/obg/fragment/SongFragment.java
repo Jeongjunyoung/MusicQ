@@ -62,6 +62,14 @@ public class SongFragment extends Fragment{
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (intent.getStringExtra("setIds") != null) {
+                Log.d("SET", "setIds");
+                setAudioList();
+                /*getMusicListInPlayList();*/
+                //mAdapterMusic.notifyDataSetChanged();
+                //mAdapterMusic.setPlayingAudios();
+                //recreate();
+            }
             int position = intent.getIntExtra("position",0);
             changeMusic(position);
         }
@@ -142,10 +150,15 @@ public class SongFragment extends Fragment{
         Log.d("change", "MUSIC : SONGF");
         mAdapter.bottomUIChangeMusic(position);
     }
+    private void setAudioList() {
+        MusicApplication.getInstance().getServiceInterface().setPlayList(mAdapter.getAudioIds(),"SongAdapter");
+        MusicApplication.getInstance().getServiceInterface().forward();
+    }
     public void registerBroadcast(){
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastActions.PREPARED);
         filter.addAction(BroadcastActions.CHANGE_MUSIC_SONGA);
+        filter.addAction(BroadcastActions.SET_AUDIO_IDS);
         getActivity().registerReceiver(mBroadcastReceiver, filter);
     }
     public void unregisterBroadcast(){

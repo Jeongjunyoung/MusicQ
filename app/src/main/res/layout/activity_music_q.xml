@@ -51,7 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#a1d4b6"
-        android:visibility="visible"
+        android:visibility="gone"
         android:orientation="vertical">
 
         <TextView
@@ -77,11 +77,16 @@
                 android:layout_weight="1"
                 app:srcCompat="@drawable/prev_icon" />
 
-            <ImageView
+            <!--<ImageView
                 android:id="@+id/album"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1" />-->
+            <android.support.v4.view.ViewPager
+                android:id="@+id/music_pager"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
 
             <ImageView
                 android:id="@+id/next"
@@ -111,16 +116,30 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
-                <ImageView
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0:00"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="5dp"/>
+                <ImageButton
                     android:id="@+id/play"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/menu_playing_icon2" />
-
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:src="@drawable/play_icon"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:id='@+id/music_duration'
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0:00"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:layout_marginRight="7dp"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

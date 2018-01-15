@@ -122,4 +122,11 @@ public class AudioServiceInterface {
         }
         return false;
     }
+
+    public ArrayList<Long> getAudioIds() {
+        if (mService !=null) {
+            return mService.getAudioIds();
+        }
+        return null;
+    }
 }

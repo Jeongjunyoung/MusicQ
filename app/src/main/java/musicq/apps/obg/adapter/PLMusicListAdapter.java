@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -28,41 +29,60 @@ import musicq.apps.obg.service.MusicApplication;
 public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder>{
     private static int playPosition;
     private static int count;
-    private ArrayList<PLMusicListAdapter.AudioViewHolder> viewList = new ArrayList<>();
+    private ArrayList<View> viewList = new ArrayList<>();
+    private ArrayList<AudioViewHolder> holders = new ArrayList<>();
     public PLMusicListAdapter(Context context, Cursor cursor) {
         super(context, cursor);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor) {
-        PLMusicListAdapter.AudioItemList audioItem = PLMusicListAdapter.AudioItemList.bindCursor(cursor);
+        AudioItemList audioItem = AudioItemList.bindCursor(cursor);
         if (audioItem != null) {
-            ((PLMusicListAdapter.AudioViewHolder) viewHolder).setAudioItem(audioItem, cursor.getPosition());
-            /*boolean isDup = false;
-            for(int i=0;i<viewList.size();i++) {
-                if (viewList.get(i).mItem.mId == ((PLMusicListAdapter.AudioViewHolder) viewHolder).mItem.mId) {
+            ((AudioViewHolder) viewHolder).setAudioItem(audioItem, cursor.getPosition());
+            boolean isDup = false;
+            for(int i=0;i<holders.size();i++) {
+                if (holders.get(i).mItem.mId == ((PLMusicListAdapter.AudioViewHolder) viewHolder).mItem.mId) {
                     Log.d("PLMA","onBindViewHolder() >> find");
                     isDup = true;
-                    break;
                 }
-            }*/
-            //if (!isDup) {
-                viewList.add((PLMusicListAdapter.AudioViewHolder) viewHolder);
-            //}
+            }
+            if (!isDup) {
+                holders.add((AudioViewHolder) viewHolder);
+            }
         }
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song, parent, false);
-        return new PLMusicListAdapter.AudioViewHolder(v);
+        AudioViewHolder audioViewHolder = new AudioViewHolder(v);
+        audioViewHolder.mImgAlbumArt = (ImageView) v.findViewById(R.id.album_image);
+        audioViewHolder.mTitle = (TextView) v.findViewById(R.id.music_title);
+        audioViewHolder.mArtist = (TextView) v.findViewById(R.id.music_artist);
+        audioViewHolder.mIsPlaying = (ImageView) v.findViewById(R.id.is_playing);
+        v.setTag(audioViewHolder);
+        viewList.add(v);
+        return audioViewHolder;
     }
     public ArrayList<Long> getAudioIds() {
-        count = getItemCount();
+        //count = getItemCount();
+        View view = null;
         Log.d("PLMA", "getAudioIds() >> count : " + count);
         ArrayList<Long> audioIds = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            audioIds.add(viewList.get(i).mItem.mId);
+        /*for (int i = 0; i < holders.size(); i++) {
+            //view = viewList.get(i);
+            //AudioViewHolder audioViewHolder = (AudioViewHolder) view.getTag();
+            //Log.d("PLMA", "getItemId() >> ID : " + getAudioIds());
+            //audioIds.add(getItemId(i));
+            audioIds.add(holders.get(i).mItem.mId);
+            //audioIds.add(audioViewHolder.mItem.mId);
+        }*/
+        for(int i=0; i<viewList.size(); i++) {
+            view = viewList.get(i);
+            AudioViewHolder holder = (AudioViewHolder) view.getTag();
+            Log.d("PLMA", "getItemId() >> ID : " + holder.mTitle.getTag());
+            audioIds.add((Long)holder.mTitle.getTag());
         }
         return audioIds;
     }
@@ -75,8 +95,8 @@ public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.V
         public long mDuration; // 재생시간
         public String mDataPath; // 실제 데이터위치
 
-        public static PLMusicListAdapter.AudioItemList bindCursor(Cursor cursor) {
-            PLMusicListAdapter.AudioItemList audioItem = new PLMusicListAdapter.AudioItemList();
+        public static AudioItemList bindCursor(Cursor cursor) {
+            AudioItemList audioItem = new AudioItemList();
             audioItem.mId =cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID));
             audioItem.mAlbumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID));
             audioItem.mTitle = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE));
@@ -92,14 +112,15 @@ public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.V
         private ImageView mImgAlbumArt;
         private TextView mTitle;
         private TextView mArtist;
+        private ImageView mIsPlaying;
         //private TextView mTxtDuration;
-        private PLMusicListAdapter.AudioItemList mItem;
+        private AudioItemList mItem;
         private int mPosition;
         private AudioViewHolder(View view) {
             super(view);
-            mImgAlbumArt = (ImageView) view.findViewById(R.id.album_image);
+            /*mImgAlbumArt = (ImageView) view.findViewById(R.id.album_image);
             mTitle = (TextView) view.findViewById(R.id.music_title);
-            mArtist = (TextView) view.findViewById(R.id.music_artist);
+            mArtist = (TextView) view.findViewById(R.id.music_artist);*/
             //mTxtDuration = (TextView) view.findViewById(R.id.txt_duration);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -108,7 +129,7 @@ public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.V
                     MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds(), "PLMusicAdapter"); // 재생목록등록
                     MusicApplication.getInstance().getServiceInterface().play(mPosition); // 선택한 오디오재생
                     playPosition = mPosition;
-                    setNowPlaying(playPosition);
+                    setNowPlaying();
                 }
             });
         }
@@ -118,30 +139,53 @@ public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.V
             mPosition = position;
             if (playPosition == mPosition) {
                 mTitle.setTextColor(Color.parseColor("#e49292"));
+                mIsPlaying.setVisibility(View.VISIBLE);
             }
             mTitle.setText(item.mTitle);
+            mTitle.setTag(item.mId);
             mArtist.setText(item.mArtist);
+            mArtist.setTag(position);
+            mTitle.setTextColor(Color.parseColor("#464646"));
+            mIsPlaying.setImageResource(R.drawable.isplaying_icon);
+            mIsPlaying.setVisibility(View.GONE);
+            /*if (item.mId == getAudioIds().get(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition())) {
+                mTitle.setTextColor(Color.parseColor("#e49292"));
+                mIsPlaying.setVisibility(View.VISIBLE);
+            }*/
             //mArtist.setText(item.mArtist + "(" + item.mAlbum + ")");
             //mTxtDuration.setText(DateFormat.format("mm:ss", item.mDuration));
             Uri albumArtUri = ContentUris.withAppendedId(artworkUri, item.mAlbumId);
-            Picasso.with(itemView.getContext()).load(albumArtUri).error(R.drawable.album_default_icon).into(mImgAlbumArt);
+            Glide.with(itemView.getContext()).load(albumArtUri).error(R.drawable.album_default_icon).into(mImgAlbumArt);
         }
     }
-    public void setNowPlaying(int position) {
-        PLMusicListAdapter.AudioViewHolder audioViewHolder;
+    public void setNowPlaying() {
+        /*PLMusicListAdapter.AudioViewHolder audioViewHolder;
         Log.d("PLMA", "setNowPlaying() : " + position);
         for(int i=0;i<viewList.size();i++) {
             audioViewHolder = (PLMusicListAdapter.AudioViewHolder) viewList.get(i);
             if (i == position) {
-                audioViewHolder.mTitle.setTextColor(Color.parseColor("#e49292"));
+                //audioViewHolder.mTitle.setTextColor(Color.parseColor("#e49292"));
             } else {
                 audioViewHolder.mTitle.setTextColor(Color.parseColor("#464646"));
+            }
+        }*/
+        View view = null;
+        for(int i=0;i<viewList.size();i++) {
+            view = viewList.get(i);
+            AudioViewHolder holder = (AudioViewHolder) view.getTag();
+            //if (holder.mTitle.getTag() == getAudioIds().get(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition())) {
+            if((int)holder.mArtist.getTag() == playPosition){
+                holder.mTitle.setTextColor(Color.parseColor("#e49292"));
+                holder.mIsPlaying.setVisibility(View.VISIBLE);
+            } else {
+                holder.mTitle.setTextColor(Color.parseColor("#464646"));
+                holder.mIsPlaying.setVisibility(View.GONE);
             }
         }
     }
     public void bottomUIChangeMusic(int i) {
         playPosition = i;
-        setNowPlaying(i);
+        setNowPlaying();
     }
 
     public void setPlayingAudios() {
