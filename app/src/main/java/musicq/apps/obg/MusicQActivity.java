@@ -39,7 +39,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
     private static final int LOADER_ID = 0;
     private static final String TAG = "MAIN";
     private static String FRAGMENT_TAG = "PLAYING_FRAGMENT";
-    private TextView mTitle, title, mDuration;
+    private TextView mTitle, title, mDuration, pDuration;
     private SeekBar seekBar;
     private ImageView mAlbumArt, album;
     private ImageButton mPlayBtn, play;
@@ -52,6 +52,8 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         public void onReceive(Context context, Intent intent) {
             if (intent.getStringExtra("ppBtn") != null) {
                 updatePPBtn();
+            } else if (intent.getStringExtra("setIds") != null) {
+                setAudioList();
             } else {
                 updateUI();
             }
@@ -74,6 +76,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         mTitle = (TextView) findViewById(R.id.txt_title);
         title = (TextView) findViewById(R.id.title);
         mDuration = (TextView) findViewById(R.id.music_duration);
+        pDuration = (TextView) findViewById(R.id.music_playing_duration);
         seekBar = (SeekBar) findViewById(R.id.seekbar);
         mAlbumArt = (ImageView) findViewById(R.id.album_image);
         album = (ImageView) findViewById(R.id.album);
@@ -140,6 +143,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
                 if (b) {
                     MusicApplication.getInstance().getServiceInterface().seekTo(i);
                 }
+                pDuration.setText(setDuration(i/60000,(i%60000)/1000));
             }
 
             @Override
@@ -166,11 +170,13 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             public void onPageSelected(int position) {
                 int mPosition =  MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition();
                 Log.d("MAIN", "PagerListener() >> position : "+position + ", mPosition : "+ mPosition + ", mState : "+mState);
-                if (position > mPosition && mState == 2) {
+                /*if (position > mPosition && mState == 2) {
+                    Log.d("MAIN", "UP");
                     MusicApplication.getInstance().getServiceInterface().forward();
                 } else if(position < mPosition && mState == 2){
+                    Log.d("MAIN", "DOWN");
                     MusicApplication.getInstance().getServiceInterface().rewind();
-                }
+                }*/
             }
 
             @Override
@@ -197,7 +203,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.btn_rewind:
                 // 이전곡으로 이동
                 MusicApplication.getInstance().getServiceInterface().rewind();
-                viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
+               //viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
                 break;
             case R.id.btn_play_pause:
                 // 재생 또는 일시정지
@@ -206,27 +212,28 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.btn_forward:
                 // 다음곡으로 이동
                 MusicApplication.getInstance().getServiceInterface().forward();
-                viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
+                //viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
                 break;
             case R.id.play:
                 MusicApplication.getInstance().getServiceInterface().togglePlay();
                 break;
             case R.id.pre:
                 MusicApplication.getInstance().getServiceInterface().rewind();
-                viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition(),true);
+                //viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
                 break;
             case R.id.next:
                 MusicApplication.getInstance().getServiceInterface().forward();
-                viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition(),true);
+                //viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
                 break;
         }
     }
 
     private void updateUI() {
-        seekBar.setProgress(0);
         seekBar.setMax(MusicApplication.getInstance().getServiceInterface().getDuration());
+        seekBar.setProgress(0);
         pagerAdapter.setAudioIds();
         pagerAdapter.notifyDataSetChanged();
+        Log.d("MA","getNowPlayingPosition() : "+MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
         viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
         if (MusicApplication.getInstance().getServiceInterface().isPlaying()) {
             mPlayBtn.setImageResource(R.drawable.pause_icon);
@@ -243,10 +250,8 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             mTitle.setText(audioItem.mTitle);
             title.setText(audioItem.mTitle);
             int sec_duration = (int)audioItem.mDuration / 1000;
-            Log.d("MAIN", "Minutes : " + sec_duration/60 + "Seconds : " + sec_duration%60);
-            Log.d("MAIN", "Duration : " + setDuration(sec_duration/60, sec_duration%60));
-
-            //mDuration.setText();
+            String maxDuration = setDuration(sec_duration/60, sec_duration%60);
+            mDuration.setText(maxDuration);
         } else {
             //mImgAlbumArt.setImageResource(R.drawable.empty_albumart);
             mTitle.setText("재생중인 음악이 없습니다.");
@@ -255,8 +260,6 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void updatePPBtn() {
-        /*seekBar.setProgress(0);
-        seekBar.setMax(MusicApplication.getInstance().getServiceInterface().getDuration());*/
         if (MusicApplication.getInstance().getServiceInterface().isPlaying()) {
             mPlayBtn.setImageResource(R.drawable.pause_icon);
             play.setImageResource(R.drawable.pause_icon);
@@ -271,6 +274,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         filter.addAction(BroadcastActions.PLAY_STATE_CHANGED);
         filter.addAction(BroadcastActions.CHANGE_MUSIC_SONGA);
         filter.addAction(BroadcastActions.CHANGE_MUSIC_PLMA);
+        filter.addAction(BroadcastActions.SET_AUDIO_IDS_SONG);
         registerReceiver(mBroadcastReceiver, filter);
     }
     public void unregisterBroadcast(){
@@ -282,8 +286,8 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         public void run() {
             while(MusicApplication.getInstance().getServiceInterface().isPlaying()){
                 try {
-                    Thread.sleep(500);
-                    if (MusicApplication.getInstance().getServiceInterface().isMediaAlive()) {
+                    Thread.sleep(1000);
+                    if (MusicApplication.getInstance().getServiceInterface().isPlaying()) {
                         //Log.d("MAIN","Current : " + MusicApplication.getInstance().getServiceInterface().getCurrentPosition());
                         seekBar.setProgress(MusicApplication.getInstance().getServiceInterface().getCurrentPosition());
                     }
@@ -311,6 +315,10 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             secondsStr = String.valueOf(seconds);
         }
         return minutesStr + ":" + secondsStr;
+    }
+    private void setAudioList() {
+        //MusicApplication.getInstance().getServiceInterface().setPlayList(mAdapter.getAudioIds(),"SongAdapter");
+        //MusicApplication.getInstance().getServiceInterface().forward();
     }
     /*Playing Layout 에서 목록으로
     * Playing Layout 에서 Control 기능

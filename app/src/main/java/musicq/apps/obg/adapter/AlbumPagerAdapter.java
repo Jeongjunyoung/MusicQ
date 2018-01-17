@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import musicq.apps.obg.service.MusicApplication;
 public class AlbumPagerAdapter extends PagerAdapter {
     LayoutInflater inflater;
     private ArrayList<Long> mAudioIds;
-    private final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
+    //private final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
     public AlbumPagerAdapter(LayoutInflater inflater) {
         this.inflater  = inflater;
     }
@@ -47,8 +48,12 @@ public class AlbumPagerAdapter extends PagerAdapter {
         view = inflater.inflate(R.layout.item_album_pager, null);
         ImageView album = (ImageView) view.findViewById(R.id.album_pager);
         Log.d("PAGER", "AudioIDs : " + mAudioIds.get(position));
-        Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mAudioIds.get(position));
-        Picasso.with(view.getContext()).load(albumArtUri).error(R.drawable.album_default_icon).fit().into(album);
+        MusicAdapter.AudioItem audioItem = MusicApplication.getInstance().getServiceInterface().getAudioItem();
+        if (audioItem != null) {
+            Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), audioItem.mAlbumId);
+            Glide.with(view.getContext()).load(albumArtUri).error(R.drawable.album_default_icon).into(album);
+        }
+        //Picasso.with(view.getContext()).load(albumArtUri).error(R.drawable.album_default_icon).fit().into(album);
         container.addView(view);
         return view;
     }

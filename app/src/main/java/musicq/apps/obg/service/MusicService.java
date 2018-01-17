@@ -42,7 +42,6 @@ public class MusicService extends Service {
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                Log.d("SPL","CHECK");
                 isPrepared = true;
                 mp.start();
                 Intent intent = null;
@@ -50,6 +49,7 @@ public class MusicService extends Service {
                 if (mListAdapter.equals("PLMusicAdapter")) {
                     intent = new Intent(BroadcastActions.CHANGE_MUSIC_PLMA);
                 } else if(mListAdapter.equals("SongAdapter")){
+                    Log.d("SPL","CHECK");
                     intent = new Intent(BroadcastActions.CHANGE_MUSIC_SONGA);
                 }
                 intent.putExtra("position", mCurrentPosition);
@@ -77,7 +77,12 @@ public class MusicService extends Service {
             public void onCompletion(MediaPlayer mediaPlayer) {
                 Log.d("SER","Complete");
                 //MusicApplication.getInstance().getServiceInterface().forward();
-                Intent intent = new Intent(BroadcastActions.SET_AUDIO_IDS);
+                Intent intent = null;
+                if (mListAdapter.equals("PLMusicAdapter")) {
+                    intent = new Intent(BroadcastActions.SET_AUDIO_IDS);
+                } else if(mListAdapter.equals("SongAdapter")){
+                    intent = new Intent(BroadcastActions.SET_AUDIO_IDS_SONG);
+                }
                 intent.putExtra("setIds", "setIds");
                 sendBroadcast(intent);
             }

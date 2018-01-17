@@ -120,6 +120,7 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
                         /*mTitle.setTextColor(Color.parseColor("#e49292"));
                         mIsPlaying.setVisibility(View.VISIBLE);*/
                         //notifyDataSetChanged();
+                        Log.d("MA", "CLICK MUSIC");
                         setNowPlaying();
                     }
                 });
@@ -135,6 +136,7 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
             mTitle.setText(item.mTitle);
             mTitle.setTag(item.mId);
             mArtist.setText(item.mArtist);
+            mArtist.setTag(position);
             mTitle.setTextColor(Color.parseColor("#464646"));
             mIsPlaying.setImageResource(R.drawable.isplaying_icon);
             mIsPlaying.setVisibility(View.GONE);
@@ -152,6 +154,7 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
             }
             //mArtist.setText(item.mArtist + "(" + item.mAlbum + ")");
             //mTxtDuration.setText(DateFormat.format("mm:ss", item.mDuration));
+
             Uri albumArtUri = ContentUris.withAppendedId(artworkUri, item.mAlbumId);
             //Picasso.with(itemView.getContext()).load(albumArtUri).error(R.drawable.album_default_icon).fit().into(mImgAlbumArt);
             //mImgAlbumArt.setImageResource(R.drawable.album_default_icon);
@@ -178,7 +181,7 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
         for(int i=0; i<viewList.size();i++) {
             view = viewList.get(i);
             AudioViewHolder holder = (AudioViewHolder) view.getTag();
-            if (holder.mTitle.getTag() == getAudioIds().get(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition())) {
+            if ((int)holder.mArtist.getTag() == playPosition){
                 //Log.d("MAdatper", "viewHolder : " + holder.mTitle.getText());
                 holder.mTitle.setTextColor(Color.parseColor("#e49292"));
                 holder.mIsPlaying.setVisibility(View.VISIBLE);

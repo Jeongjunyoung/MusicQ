@@ -11,4 +11,5 @@ public class BroadcastActions {
     public final static String CHANGE_MUSIC_PLMA = "CHANGE_MUSIC_PLMA";
     public final static String INSERT_PLAYLIST_MUSIC = "INSERT_PLAYLIST_MUSIC";
     public final static String SET_AUDIO_IDS = "SET_AUDIO_IDS";
+    public final static String SET_AUDIO_IDS_SONG = "SET_AUDIO_IDS_SONG";
 }
