@@ -47,10 +47,13 @@ public class AlbumPagerAdapter extends PagerAdapter {
         Log.d("PAGER", "instantiateItem() 호출");
         view = inflater.inflate(R.layout.item_album_pager, null);
         ImageView album = (ImageView) view.findViewById(R.id.album_pager);
-        Log.d("PAGER", "AudioIDs : " + mAudioIds.get(position));
+
         MusicAdapter.AudioItem audioItem = MusicApplication.getInstance().getServiceInterface().getAudioItem();
+        ArrayList<Long> albumIds = MusicApplication.getInstance().getServiceInterface().getAlbumIds();
         if (audioItem != null) {
-            Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), audioItem.mAlbumId);
+            Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumIds.get(position));
+            Log.d("PAGER", "AlbumId : " + audioItem.mAlbumId + "   albumIds.get(position) : " + albumIds.get(position));
+            Log.d("PAGER", "Title : " + audioItem.mTitle + "albumIds.size() : " + albumIds.size());
             Glide.with(view.getContext()).load(albumArtUri).error(R.drawable.album_default_icon).into(album);
         }
         //Picasso.with(view.getContext()).load(albumArtUri).error(R.drawable.album_default_icon).fit().into(album);

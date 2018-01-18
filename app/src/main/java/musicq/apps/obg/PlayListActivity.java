@@ -208,7 +208,7 @@ public class PlayListActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void setAudioList() {
-        MusicApplication.getInstance().getServiceInterface().setPlayList(mAdapterMusic.getAudioIds(),"PLMusicAdapter");
+        MusicApplication.getInstance().getServiceInterface().setPlayList(mAdapterMusic.getAudioIds(), null,"PLMusicAdapter");
         MusicApplication.getInstance().getServiceInterface().forward();
     }
     private void updateUI() {

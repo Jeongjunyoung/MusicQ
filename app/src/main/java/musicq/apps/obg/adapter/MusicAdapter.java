@@ -27,6 +27,7 @@ import musicq.apps.obg.service.MusicApplication;
 public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder>{
     private static int playPosition;
     private ArrayList<View> viewList = new ArrayList<>();
+    private Cursor mCursor;
     //private AsyncBitmapLoader mAsyncBitmapLoader;
     public MusicAdapter(Context context, Cursor cursor) {
         super(context, cursor);
@@ -34,6 +35,7 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor) {
         AudioItem audioItem = AudioItem.bindCursor(cursor);
+        mCursor = cursor;
         if (audioItem != null) {
             ((AudioViewHolder) viewHolder).setAudioItem(audioItem, cursor.getPosition(), viewHolder.getAdapterPosition());
             /*boolean isDup = false;
@@ -83,6 +85,7 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
             audioItem.mAlbum = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM));
             audioItem.mDuration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION));
             audioItem.mDataPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA));
+            //Log.d("MA","mAlbumId : " +cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID)));
             return audioItem;
         }
     }
@@ -93,6 +96,23 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
             audioIds.add(getItemId(i));
         }
         return audioIds;
+    }
+
+    public ArrayList<Long> getAlbumIds() {
+        int count = getItemCount();
+        View view = null;
+        ArrayList<Long> albumIds = new ArrayList<>();
+
+        /*for (int i=0;i<viewList.size();i++) {
+            view = viewList.get(i);
+            AudioViewHolder holder = (AudioViewHolder) view.getTag();
+            albumIds.add(holder.mItem.mAlbumId);
+            Log.d("MA", "albumIds : " + holder.mItem.mAlbumId);
+        }*/
+        for(int i=0;i<count;i++) {
+            albumIds.add(getAlbumId(i));
+        }
+        return albumIds;
     }
     private class AudioViewHolder extends RecyclerView.ViewHolder {
             private final Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
@@ -114,13 +134,14 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
                     @Override
                     public void onClick(View v) {
                         Log.d("ID", "" + mPosition);
-                        MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds(), "SongAdapter"); // 재생목록등록
+                        MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds(), getAlbumIds(),"SongAdapter"); // 재생목록등록
                         MusicApplication.getInstance().getServiceInterface().play(mPosition); // 선택한 오디오재생
                         playPosition = mPosition;
                         /*mTitle.setTextColor(Color.parseColor("#e49292"));
                         mIsPlaying.setVisibility(View.VISIBLE);*/
                         //notifyDataSetChanged();
                         Log.d("MA", "CLICK MUSIC");
+                        getAlbumIds();
                         setNowPlaying();
                     }
                 });
@@ -191,6 +212,14 @@ public class MusicAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHol
             }
         }
 
+    }
+
+    public long getAlbumId(int position) {
+        int mRowAlbumIdColumn = mCursor != null ? mCursor.getColumnIndex("album_id") : -1;
+        if (mCursor != null && mCursor.moveToPosition(position)) {
+            return mCursor.getLong(mRowAlbumIdColumn);
+        }
+        return 0;
     }
     public void bottomUIChangeMusic(int i) {
         playPosition = i;

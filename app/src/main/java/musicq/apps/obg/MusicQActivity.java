@@ -47,6 +47,7 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
     private LinearLayout playingLayout;
     private ProgressUpdate progressUpdate;
     private ViewPager viewPager;
+    private boolean isNext = false;
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -55,6 +56,10 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
             } else if (intent.getStringExtra("setIds") != null) {
                 setAudioList();
             } else {
+                Log.d("MAIN","po" + MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
+                pagerAdapter.notifyDataSetChanged();
+                pagerAdapter.setAudioIds();
+                viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
                 updateUI();
             }
 
@@ -218,11 +223,20 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
                 MusicApplication.getInstance().getServiceInterface().togglePlay();
                 break;
             case R.id.pre:
+                //pagerAdapter.setAudioIds();
+                //pagerAdapter.notifyDataSetChanged();
+                isNext = false;
                 MusicApplication.getInstance().getServiceInterface().rewind();
+                viewPager.setCurrentItem(viewPager.getCurrentItem()-1,true);
                 //viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
                 break;
             case R.id.next:
+                //pagerAdapter.setAudioIds();
+                //pagerAdapter.notifyDataSetChanged();
+                isNext = true;
                 MusicApplication.getInstance().getServiceInterface().forward();
+                //pagerAdapter.notifyDataSetChanged();
+                viewPager.setCurrentItem(viewPager.getCurrentItem()+1,true);
                 //viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
                 break;
         }
@@ -233,8 +247,15 @@ public class MusicQActivity extends AppCompatActivity implements View.OnClickLis
         seekBar.setProgress(0);
         pagerAdapter.setAudioIds();
         pagerAdapter.notifyDataSetChanged();
-        Log.d("MA","getNowPlayingPosition() : "+MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
-        viewPager.setCurrentItem(MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition());
+        /*if (isNext) {
+            Log.d("MA","viewPager.getCurrentItem() : "+viewPager.getCurrentItem());
+            viewPager.setCurrentItem(viewPager.getCurrentItem() +2, true);
+        } else if(!isNext) {
+            Log.d("MA","viewPager.getCurrentItem() : "+viewPager.getCurrentItem());
+            viewPager.setCurrentItem(viewPager.getCurrentItem()+2, true);
+        }*/
+
+
         if (MusicApplication.getInstance().getServiceInterface().isPlaying()) {
             mPlayBtn.setImageResource(R.drawable.pause_icon);
             play.setImageResource(R.drawable.pause_icon);

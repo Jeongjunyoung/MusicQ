@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 /**
  * Created by d1jun on 2017-12-17.
@@ -14,6 +15,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
     private Cursor mCursor;
     private boolean mDataValid;
     private int mRowIdColumn;
+    private int mRowAlbumIdColumn;
     private DataSetObserver mDataSetObserver;
 
     public CursorRecyclerViewAdapter(Context context, Cursor cursor) {
@@ -21,6 +23,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         mCursor = cursor;
         mDataValid = cursor != null;
         mRowIdColumn = mDataValid ? mCursor.getColumnIndex("_id") : -1;
+        mRowAlbumIdColumn = mDataValid ? mCursor.getColumnIndex("album_id") : -1;
         mDataSetObserver = new NotifyingDataSetObserver();
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
@@ -46,6 +49,15 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         }
         return 0;
     }
+
+
+    /*public long getAlbumId(int position) {
+        if (mDataValid && mCursor != null && mCursor.moveToPosition(position)) {
+            Log.d("CRVA", String.valueOf(mRowAlbumIdColumn));
+            //return mCursor.getLong(mRowAlbumIdColumn);
+        }
+        return 0;
+    }*/
 
     @Override
     public void setHasStableIds(boolean hasStableIds) {

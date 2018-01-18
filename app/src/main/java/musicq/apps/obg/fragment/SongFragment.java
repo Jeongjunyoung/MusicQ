@@ -151,7 +151,7 @@ public class SongFragment extends Fragment{
         mAdapter.bottomUIChangeMusic(position);
     }
     private void setAudioList() {
-        MusicApplication.getInstance().getServiceInterface().setPlayList(mAdapter.getAudioIds(),"SongAdapter");
+        MusicApplication.getInstance().getServiceInterface().setPlayList(mAdapter.getAudioIds(),null,"SongAdapter");
         MusicApplication.getInstance().getServiceInterface().forward();
     }
     public void registerBroadcast(){

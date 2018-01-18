@@ -126,7 +126,7 @@ public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.V
                 @Override
                 public void onClick(View v) {
                     Log.d("ID", "" + mPosition);
-                    MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds(), "PLMusicAdapter"); // 재생목록등록
+                    //MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds(), "PLMusicAdapter"); // 재생목록등록
                     MusicApplication.getInstance().getServiceInterface().play(mPosition); // 선택한 오디오재생
                     playPosition = mPosition;
                     setNowPlaying();
@@ -189,7 +189,7 @@ public class PLMusicListAdapter extends CursorRecyclerViewAdapter<RecyclerView.V
     }
 
     public void setPlayingAudios() {
-        MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds(), "PLMusicAdapter");
+        //MusicApplication.getInstance().getServiceInterface().setPlayList(getAudioIds(), "PLMusicAdapter");
         Log.d("PLMA", "setPlayingAudios() >> position : "+playPosition);
         //playPosition = MusicApplication.getInstance().getServiceInterface().getNowPlayingPosition();
         Log.d("PLMA", "setPlayingAudios() >> position : "+playPosition);

@@ -23,11 +23,11 @@ public class MusicService extends Service {
     private MediaPlayer mMediaPlayer;
     private boolean isPrepared;
     private ArrayList<Long> mAudioIds = new ArrayList<>();
+    private ArrayList<Long> mAlbumIds = new ArrayList<>();
     private int mCurrentPosition;
     private String mListAdapter;
     private MusicAdapter.AudioItem mAudioItem;
     private MusicAdapter musicAdapter = new MusicAdapter(this, null);
-    private PLMusicListAdapter playMusicAdapter = new PLMusicListAdapter(this, null);
     public class AudioServiceBinder extends Binder {
         public MusicService getService() {
             return MusicService.this;
@@ -49,7 +49,6 @@ public class MusicService extends Service {
                 if (mListAdapter.equals("PLMusicAdapter")) {
                     intent = new Intent(BroadcastActions.CHANGE_MUSIC_PLMA);
                 } else if(mListAdapter.equals("SongAdapter")){
-                    Log.d("SPL","CHECK");
                     intent = new Intent(BroadcastActions.CHANGE_MUSIC_SONGA);
                 }
                 intent.putExtra("position", mCurrentPosition);
@@ -105,11 +104,13 @@ public class MusicService extends Service {
         }
     }
 
-    public void setPlayList(ArrayList<Long> audioIds, String setListAdapter) {
+    public void setPlayList(ArrayList<Long> audioIds, ArrayList<Long> albumIds, String setListAdapter) {
         if (mAudioIds.size() != audioIds.size()) {
             if (!mAudioIds.equals(audioIds)) {
                 mAudioIds.clear();
                 mAudioIds.addAll(audioIds);
+                mAlbumIds.clear();
+                mAlbumIds.addAll(albumIds);
                 mListAdapter = setListAdapter;
             }
         }
@@ -227,6 +228,9 @@ public class MusicService extends Service {
         mMediaPlayer.seekTo(position);
     }
 
+    public ArrayList<Long> getAlbumIds(){
+        return mAlbumIds;
+    }
     public ArrayList<Long> getAudioIds() {
         return mAudioIds;
     }
